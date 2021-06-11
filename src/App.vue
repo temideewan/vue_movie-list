@@ -13,13 +13,14 @@
 </template>
 
 <style>
-html:focus-within{
+html{
   scroll-behavior: smooth;
   
 }
 body{
   margin: 0;
   padding: 0;
+  overflow-x: hidden;
 }
 *{
   box-sizing: border-box;
@@ -40,7 +41,7 @@ body{
   background-color: #eee;
   display: flex;
   justify-content: center;
-  gap: 500px;
+  gap: max(700px, 50%);
   align-items: center;
   min-width: 650px;
   width: 100%;

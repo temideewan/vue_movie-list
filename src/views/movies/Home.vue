@@ -8,7 +8,10 @@
     <section id="movie__list" class="movies">
       <h2 class="movie__list--title">Movie List</h2>
 
-      <div v-if="movies.length > 0" class="list_movies">
+      <div v-if="isError" class="error">
+        {{error}}
+      </div>
+      <div v-else-if="movies.length > 0 && !isError" class="list_movies">
         <div v-for="movie in movies" :key="movie.id" class="movie__card">
           <img :src="movie.url" class="movie__image" />
           <h3 class="movie__title"> {{movie.title}} </h3>
@@ -19,9 +22,9 @@
             <div class="category">
               <p v-for="genre in movie.genre" :key='genre'> {{genre}} </p>
             </div>
-            <p class="year">{{movie.released}}</p>
+            <p class="year">Released in {{movie.year}}</p>
           </div>
-          <a href="" class="movie__cta">View more</a>
+          <router-link :to="{name: 'Details', params: {id:movie.id}}" @click="pushDets"  class="movie__cta">View more</router-link>
         </div>
       </div>
       <div v-else>
@@ -32,6 +35,12 @@
 </template>
 
 <script>
+
+function FetchException(message){
+  this.message = message;
+  this.name = 'fetchException';
+}
+
 export default {
   name: "Home",
   components: {},
@@ -39,6 +48,8 @@ export default {
   data() {
     return {
       movies: [],
+      isError: false,
+      error: ''
     };
   },
 
@@ -46,12 +57,18 @@ export default {
     fetch("https://ott-details.p.rapidapi.com/getnew?region=US&page=1", {
       method: "GET",
       headers: {
-        "x-rapidapi-key": "31ae43d4b5mshdf4eee6de3c1624p12c8b9jsn41eaf5b79d06",
+        "x-rapidapi-key": process.env.VUE_APP_API_KEY,
         "x-rapidapi-host": "ott-details.p.rapidapi.com",
       },
     })
       .then((response) => {
-        return response.json();
+        console.log(response);
+        if(response.status === 200){
+
+          return response.json();
+        } else{
+          throw new FetchException('Could not fetch the requested data');
+        }
       })
       .then((response) => {
         let { results } = response;
@@ -69,9 +86,12 @@ export default {
 
         console.log(results);
         console.log(this.movies);
+
       })
       .catch((err) => {
-        console.error(err);
+        this.isError = true;
+        this.error ='Something went wrong trying to get the movies please check your internet connection and try again';
+        console.error(err.name);
       });
   },
 };
@@ -85,7 +105,7 @@ export default {
       rgba(0, 0, 0, 0.322),
       rgba(0, 0, 0, 0.849)
     ),
-    url("../assets/movies.jpg");
+    url("../../assets/movies.jpg");
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
@@ -137,11 +157,14 @@ export default {
 }
 
 .movie__card {
+  width: 650px;
+  max-width: 90%;
+  height: 100%;
   border-radius: 5px;
   background-color: rgb(252, 246, 223);
   display: flex;
   flex-direction: column;
-  padding: 10px;
+  padding: 15px;
 }
 
 .movie__image {
@@ -169,7 +192,7 @@ export default {
   width: 60%;
   background-color: #ffdc60;
   color: #1b1b1b;
-  margin: 20px auto 0;
+  margin: auto auto 0;
   padding: 10px 20px;
   border-radius: inherit;
   text-decoration: none;
@@ -215,8 +238,9 @@ export default {
 }
 
 .year {
-  font-size: 14px;
+  font-size: 13px;
   color: rgb(46, 44, 37);
-  font-weight: bold;
+  font-weight: normal;
+  letter-spacing: 1px;
 }
 </style>

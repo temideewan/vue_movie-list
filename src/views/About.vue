@@ -1,6 +1,10 @@
 <template>
   <div class="about">
-    <h1>This is an about page</h1>
-    <p>Welcome to the </p>
+    <h1>The movies</h1>
+    <p>The number one stop shop for all your latest movies</p>
   </div>
 </template>
+
+<style>
+
+</style>
